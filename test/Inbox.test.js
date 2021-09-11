@@ -7,6 +7,7 @@ const web3 = new Web3(ganache.provider());
 
 let fetchedAccounts;
 let inbox;
+const INITIAL_STRING = 'Hi there!';
 
 beforeEach(async () => {
   // Get a list of all accounts
@@ -16,7 +17,7 @@ beforeEach(async () => {
   inbox = await new web3.eth.Contract(JSON.parse(interface))
     .deploy({
       data: bytecode,
-      arguments: ['Hi There!'],
+      arguments: [INITIAL_STRING],
     })
     .send({ from: fetchedAccounts[0], gas: '1000000' });
 });
@@ -25,5 +26,11 @@ describe('Inbox', () => {
   it('deploys a contract', () => {
     // console.log(inbox.options.address);
     assert.ok(inbox.options.address);
+  });
+
+  it('has a default message', async () => {
+    const message = await inbox.methods.message().call();
+
+    assert.equal(message, INITIAL_STRING);
   });
 });
